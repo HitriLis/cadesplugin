@@ -2,41 +2,21 @@ function canAsync(cadesplugin: CADESPlugin): cadesplugin is CADESPluginAsync {
     return !!(cadesplugin as CADESPluginAsync).CreateObjectAsync;
 }
 
-function init(): void {
-    const canPromise = !!(window as any).Promise;
-    if (canPromise) {
-        cadesplugin.then(
-            () => main(),
-            e => alert(e)
-        );
-    } else {
-        window.addEventListener("message", function (event) {
-            if (event.data == "cadesplugin_loaded") {
-                main();
-            } else if (event.data == "cadesplugin_load_error") {
-                alert("Cannot load plugin.");
-            }
-        }, false);
-
-        window.postMessage("cadesplugin_echo_request", "*");
-    }
-}
-
-async function main(): Promise<void> {
+async function testListCertificates(): Promise<void> {
     if (canAsync(cadesplugin)) {
         await getCertificatesList(cadesplugin);
-        const signature = await SignCreate(cadesplugin, '1628BD226C5BB9B56C860AFA9FE6C461D22F8DFF', 'data');
-        if (signature !== null) {
-            const result = await SignVerify(cadesplugin, signature, 'data');
-            alert(result);
-        }
+        // const signature = await SignCreate(cadesplugin, '1628BD226C5BB9B56C860AFA9FE6C461D22F8DFF', 'data');
+        // if (signature !== null) {
+        //     const result = await SignVerify(cadesplugin, signature, 'data');
+        //     alert(result);
+        // }
     } else {
         getCertificatesListSync(cadesplugin);
-        const signature = SignCreateSync(cadesplugin, '1628BD226C5BB9B56C860AFA9FE6C461D22F8DFF', 'data');
-        if (signature !== null) {
-            const result = SignVerifySync(cadesplugin, signature, 'data');
-            alert(result);
-        }
+        // const signature = SignCreateSync(cadesplugin, '1628BD226C5BB9B56C860AFA9FE6C461D22F8DFF', 'data');
+        // if (signature !== null) {
+        //     const result = SignVerifySync(cadesplugin, signature, 'data');
+        //     alert(result);
+        // }
     }
 }
 
@@ -184,6 +164,3 @@ function SignVerifySync(cadesplugin: CADESPluginSync, signature: string, origDat
     }
 }
 
-document.addEventListener('DOMContentLoaded', () => {
-    init();
-});

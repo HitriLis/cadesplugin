@@ -4,6 +4,7 @@
   "description": "Type definitions for CryptoPro browser plugin",
   "main": "",
   "scripts": {
+    "start": "node server.js",
     "build": "tsc",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -25,5 +26,9 @@
   "publishConfig": {
     "registry": "https://registry.npmjs.org"
   },
-  "types": "index.d.ts"
+  "types": "index.d.ts",
+  "dependencies": {
+    "express": "^4.19.2",
+    "typescript": "^5.5.4"
+  }
 }

@@ -1,0 +1,13 @@
+version: '3.8'
+
+services:
+  app:
+    build:
+      context: .  # Указывает, что Dockerfile находится в текущей директории
+      dockerfile: Dockerfile  # Указывает имя Dockerfile (по умолчанию - Dockerfile)
+    volumes:
+      - .:/app
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=development
