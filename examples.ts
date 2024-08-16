@@ -26,24 +26,26 @@ function base64ToFile(base64String, filename) {
     document.body.removeChild(a);
 }
 
-
 function canAsync(cadesplugin: CADESPlugin): cadesplugin is CADESPluginAsync {
     return !!(cadesplugin as CADESPluginAsync).CreateObjectAsync;
 }
 
 async function testSign(): Promise<void> {
+    // отпечаток подписи тестовый thumbprint (для корректной работы выбираем из списка)
+    // await cert.Thumbprint получить можно так в getCertificatesList есть пример
     const thumbprint = 'AA476BAC99432503C5CB6DF90E879A39617150DE'
+    // Определяем Async или sync canAsync(cadesplugin)
+    // testBase64String необходимый файл конвертированый в Base64
+    // SignCreate вернет Base64 сохроняем его как .sig файл
     if (canAsync(cadesplugin)) {
         const signature = await SignCreate(cadesplugin, thumbprint, testBase64String);
         if (signature !== null) {
-            // const result = await SignVerify(cadesplugin, signature, 'data');
             const signatureBase64String = `data:application/octet-stream;base64,${signature}`;
             base64ToFile(signatureBase64String, 'test.png.sig');
         }
     } else {
         const signature = SignCreateSync(cadesplugin, thumbprint, testBase64String);
         if (signature !== null) {
-            // const result = SignVerifySync(cadesplugin, signature, 'data');
             const signatureBase64String = `data:application/octet-stream;base64,${signature}`;
             base64ToFile(signatureBase64String, 'test.png.sig');
         }
@@ -51,6 +53,7 @@ async function testSign(): Promise<void> {
 }
 
 async function testListCertificates(): Promise<void> {
+   // использовать для автоматического выбора действующего сертификата
     if (canAsync(cadesplugin)) {
         await getCertificatesList(cadesplugin);
     } else {
@@ -72,7 +75,11 @@ async function getCertificatesList(cadesplugin: CADESPluginAsync): Promise<void>
     if (div) {
         const certCount = await certificates.Count;
         for (let i = 1; i <= certCount; ++i) {
+
             const cert = await certificates.Item(i);
+            const Validator = await cert.IsValid();
+            const IsValid = await Validator.Result;
+            console.log(IsValid)
             const elem = document.createElement('p');
             elem.innerHTML = `${await cert.Thumbprint}<br/>${await cert.SubjectName}`;
             div.appendChild(elem);
@@ -118,6 +125,7 @@ async function SignCreate(cadesplugin: CADESPluginAsync, thumbprint: string, dat
         alert('Certificate not found.');
         return null;
     }
+
 
     const cert = await result.Item(1);
     const signer = await cadesplugin.CreateObjectAsync('CAdESCOM.CPSigner');
